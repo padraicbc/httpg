@@ -194,7 +194,7 @@ func (r *Rq) prepare(s *Session) (*http.Request, error) {
 	req.ContentLength = r.Request.ContentLength
 	if req.GetBody != nil {
 		var err error
-		req.Body, err = bodyutil.Open(req)
+		req.Body, err = bodyutil.Open(req.GetBody)
 		if err != nil {
 			return nil, err
 		}

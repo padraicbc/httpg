@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"net/http"
 
 	"github.com/padraicbc/httpg/internal/check"
 )
@@ -17,9 +16,9 @@ func Close(c io.Closer) {
 	}
 }
 
-// Open reopens req.Body through GetBody, rejecting nil bodies.
-func Open(req *http.Request) (io.ReadCloser, error) {
-	body, err := req.GetBody()
+// Open reopens a body through getBody, rejecting nil bodies.
+func Open(getBody func() (io.ReadCloser, error)) (io.ReadCloser, error) {
+	body, err := getBody()
 	if err != nil {
 		if !check.NilLike(body) {
 			_ = body.Close()

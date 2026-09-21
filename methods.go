@@ -53,7 +53,7 @@ func (s *Session) Do(r *Rq) (*Responser, error) {
 		}
 		current := req.Clone(req.Context())
 		if req.GetBody != nil {
-			current.Body, err = bodyutil.Open(req)
+			current.Body, err = bodyutil.Open(req.GetBody)
 			if err != nil {
 				return nil, err
 			}

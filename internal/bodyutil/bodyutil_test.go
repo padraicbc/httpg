@@ -3,7 +3,6 @@ package bodyutil
 import (
 	"errors"
 	"io"
-	"net/http"
 	"strings"
 	"testing"
 )
@@ -27,13 +26,13 @@ func TestClose(t *testing.T) {
 }
 
 func TestOpen(t *testing.T) {
-	if _, err := Open(&http.Request{GetBody: func() (io.ReadCloser, error) { return nil, nil }}); err == nil {
+	if _, err := Open(func() (io.ReadCloser, error) { return nil, nil }); err == nil {
 		t.Error("nil body accepted")
 	}
-	if _, err := Open(&http.Request{GetBody: func() (io.ReadCloser, error) { return io.NopCloser(nil), errors.New("x") }}); err == nil {
+	if _, err := Open(func() (io.ReadCloser, error) { return io.NopCloser(nil), errors.New("x") }); err == nil {
 		t.Error("error accepted")
 	}
-	body, err := Open(&http.Request{GetBody: func() (io.ReadCloser, error) { return io.NopCloser(strings.NewReader("ok")), nil }})
+	body, err := Open(func() (io.ReadCloser, error) { return io.NopCloser(strings.NewReader("ok")), nil })
 	if err != nil {
 		t.Fatal(err)
 	}

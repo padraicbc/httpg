@@ -30,6 +30,9 @@ type outputTransport struct {
 	writer  io.Writer
 	attempt int
 	err     error
+	// getBody is the first request's GetBody. Some Go versions do not set
+	// GetBody on redirected requests, so redirect hops reuse it for dumping.
+	getBody func() (io.ReadCloser, error)
 }
 
 func (t *outputTransport) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -46,13 +49,19 @@ func (t *outputTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	// request body passed to the underlying transport.
 	clone := req.Clone(req.Context())
 	if req.Body != nil && req.Body != http.NoBody {
-		if req.GetBody == nil {
+		getBody := req.GetBody
+		if req.Response == nil {
+			t.getBody = getBody
+		} else if getBody == nil {
+			getBody = t.getBody
+		}
+		if getBody == nil {
 			err := fmt.Errorf("httpg: output requires a replayable request body")
 			t.err = err
 			return nil, err
 		}
 		var err error
-		clone.Body, err = bodyutil.Open(req)
+		clone.Body, err = bodyutil.Open(getBody)
 		if err != nil {
 			t.err = err
 			return nil, err
