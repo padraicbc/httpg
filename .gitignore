@@ -1,0 +1,6 @@
+.history/
+.vscode/
+.idea/
+.DS_Store
+*.test
+coverage.out

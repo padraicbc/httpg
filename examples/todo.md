@@ -1,0 +1,5 @@
+- Linter golang ci linter - run it loaclly also and add config
+- Github job for test etc that fails on test failure
+- Full coverage
+- Protect master branch
+- add httpg-x.x.x release version to user agent
